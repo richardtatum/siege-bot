@@ -1,6 +1,4 @@
 import discord
-import json
-import requests
 import random
 import bs4
 from robobrowser import RoboBrowser
@@ -40,32 +38,27 @@ def data_request(author, id):
             data.append(dict(zip(label, count)))
 
     total.append(dict(zip(cas_rank, data)))
-    ranked_stats = total[0]['Ranked Stats']
-    casual_stats = total[0]['Casual Stats']
-    print(casual_stats)
+    ranked = total[0]['Ranked Stats']
+    casual = total[0]['Casual Stats']
 
-    message_format(author, casual_stats)
-
-
-def message_format(author, casual):
-    try:
+    if casual is not None:
         msg = 'Standby for kill data!'
         msg2 = 'User {} has the following stats: \n \
-                Time played: {} \n \
-                Kills: {} \n \
-                Deaths: {} \n \
-                K/D: {} \n \
-                W/l: {}'.format(user, casual[0], casual[1], casual[2], casual[3], casual[6])
+                               Time played: {} \n \
+                               Kills: {} \n \
+                               Deaths: {} \n \
+                               K/D: {} \n \
+                               W/L: {}'.format(author, casual['Time Played'], casual['Kills'], casual['Deaths'], casual['K/D Ratio'], casual['W/L Ratio'])
 
-        return msg
-        return msg2
+        return msg, msg2
 
-    except:
+    else:
         msg = 'I can\'t access the R6Stats API right \
                now so I\'ll just guess your K/D instead.'
         msg2 = 'User {} has a KD of {} on Rainbow 6: Siege'.format(author, round(random.uniform(1, 5), 3))
-        return msg
-        return msg2
+        return msg, msg2
+
+
 
 
 @client.event
@@ -95,12 +88,12 @@ async def on_message(message):
         u = str(message.author)
         if u in users:
             id = users[u][2]
-            data_request(message.author, id)
-            msg, msg2 =
+            user = users[u][0].title()
+            output = data_request(user, id)
+            msg = output[0]
+            msg2 = output[1]
             await client.send_message(message.channel, msg)
             await client.send_message(message.channel, msg2)
-
-
 
 
 @client.event
