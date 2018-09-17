@@ -37,26 +37,34 @@ def data_request(author, id):
                     count.append(text.get_text())
             data.append(dict(zip(label, count)))
 
+    for user in scrape.select('.username'):
+        user = user.get_text()
+
+    for mostplayed in scrape.select('.player-header__left-side'):
+        waifu = str(mostplayed)
+        waifu = str(waifu[waifu.find('t="')+3:waifu.find('" src=')])
+
     total.append(dict(zip(cas_rank, data)))
     ranked = total[0]['Ranked Stats']
     casual = total[0]['Casual Stats']
 
     if casual is not None:
-        msg = 'Standby for kill data!'
-        msg2 = 'User {} has the following stats: \n \
-                               Time played: {} \n \
-                               Kills: {} \n \
-                               Deaths: {} \n \
-                               K/D: {} \n \
-                               W/L: {}'.format(author, casual['Time Played'], casual['Kills'], casual['Deaths'], casual['K/D Ratio'], casual['W/L Ratio'])
+        if user.lower() == author.lower():
+            msg = 'Standby for kill data!'
+            msg2 = 'User {} has the following stats: \n \
+                                   Time played: {} \n \
+                                   Kills: {} \n \
+                                   Deaths: {} \n \
+                                   K/D: {} \n \
+                                   W/L: {} \n \
+                                   Waifu: {}'.format(author, casual['Time Played'], casual['Kills'], casual['Deaths'], casual['K/D Ratio'], casual['W/L Ratio'], waifu)
 
-        return msg, msg2
+            return msg, msg2
 
-    else:
-        msg = 'I can\'t access the R6Stats API right \
-               now so I\'ll just guess your K/D instead.'
-        msg2 = 'User {} has a KD of {} on Rainbow 6: Siege'.format(author, round(random.uniform(1, 5), 3))
-        return msg, msg2
+        else:
+            msg = 'I can\'t access the R6Stats site right now so I\'ll just guess your K/D instead.'
+            msg2 = 'User {} has a KD of {} on Rainbow 6: Siege'.format(author, round(random.uniform(1, 5), 3))
+            return msg, msg2
 
 
 
@@ -81,14 +89,14 @@ async def on_message(message):
 
     if message.content.startswith('!test'):
         msg = 'Test message'
-        client.send_message(message.channel, msg)
+        await client.send_message(message.channel, msg)
 
-    if message.content.startswith('!r6'):
-        print(message.author)
+    if message.content.startswith('!r6') or message.content.startswith('!R6'):
+        print('>Stats check by ' + str(message.author))
         u = str(message.author)
         if u in users:
             id = users[u][2]
-            user = users[u][0].title()
+            user = users[u][0]
             output = data_request(user, id)
             msg = output[0]
             msg2 = output[1]
