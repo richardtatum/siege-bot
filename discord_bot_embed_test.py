@@ -1,7 +1,7 @@
 import discord
 import random
 import bs4
-from robobrowser import RoboBrowser
+import requests
 from settings import users
 
 TOKEN = 'NDkwMTIyNjY1MzM2NTA0MzIy.Dn0uGQ.uokwSV1FgO39Id7exalxEB2AvE0'
@@ -16,11 +16,9 @@ def data_request(author, id):
     global profileurl
     global username_web
 
-    br = RoboBrowser()
-    br.open('https://r6stats.com/stats/{}/'.format(id))
-    r = str(br.parsed)
-
+    r = requests.get('https://r6stats.com/stats/{}/'.format(id)).text
     scrape = bs4.BeautifulSoup(r, 'html.parser')
+    print(scrape)
 
     label = []
     count = []
