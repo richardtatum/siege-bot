@@ -55,8 +55,8 @@ def data_request(message, author, id):
 
     try:
         casual = total[0]['Casual Stats']
-        kd = round(float(casual['K/D Ratio']), 3)
-        wl = round(float(casual['W/L Ratio']), 3)
+        kd = round(float(casual['K/D Ratio']), 2)
+        wl = round(float(casual['W/L Ratio']), 2)
         return embed_creator(message, author, profileurl, casual['Time Played'], casual['Kills'], casual['Deaths'],
                              kd, wl, waifu, waifupicture)
     except:
@@ -65,20 +65,21 @@ def data_request(message, author, id):
 
 async def error_message(message, author):
     msg = 'I can\'t access the R6Stats site right now so I\'ll just guess your K/D instead.'
-    msg2 = 'User {} has a KD of {} on Rainbow 6: Siege'.format(author, round(random.uniform(1, 5), 3))
+    msg2 = 'User {} has a KD of {} on Rainbow 6: Siege'.format(author, round(random.uniform(1, 5), 2))
     await client.send_message(message.channel, msg)
     await client.send_message(message.channel, msg2)
 
 
 async def embed_creator(message, username, profileurl, timeplayed, kills, deaths, kd, wl, waifu, waifupicture):
-    embed=discord.Embed(title="Username", description=username)
+    embed=discord.Embed(title="R6 Stats Checker", color=0xe3943c)
     embed.set_thumbnail(url=profileurl)
+    embed.add_field(name="Username", value=username, inline=True)
     embed.add_field(name="Time Played", value=timeplayed, inline=True)
     embed.add_field(name="Kills", value=kills, inline=True)
     embed.add_field(name="Deaths", value=deaths, inline=True)
     embed.add_field(name="K/D Ratio", value=kd, inline=True)
     embed.add_field(name="W/L Ratio", value=wl, inline=True)
-    embed.add_field(name="Waifu", value=waifu, inline=True)
+    embed.add_field(name="Waifu", value=waifu, inline=False)
     embed.set_image(url=waifupicture)
     embed.set_footer(text="*Is there something wrong with this bot? Please let us know by emailing tough.shit@codeishard.com.*")
     await client.send_message(message.channel, embed=embed)
