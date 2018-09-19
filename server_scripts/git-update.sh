@@ -13,3 +13,5 @@ if [ "$NEW_HEAD" != "$OLD_HEAD" ]; then
 	# Restart the client
 	systemctl stop r6bot
 	systemctl start r6bot
+
+fi
