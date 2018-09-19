@@ -8,14 +8,7 @@ TOKEN = 'NDkwMTIyNjY1MzM2NTA0MzIy.Dn0uGQ.uokwSV1FgO39Id7exalxEB2AvE0'
 
 client = discord.Client()
 
-
 def data_request(message, author, id):
-    # global casual
-    # global waifu
-    # global waifupicture
-    # global profileurl
-    # global username_web
-
     r = requests.get('https://r6stats.com/stats/{}/'.format(id)).text
     scrape = bs4.BeautifulSoup(r, 'html.parser')
 
@@ -39,8 +32,8 @@ def data_request(message, author, id):
                     count.append(text.get_text())
             data.append(dict(zip(label, count)))
 
-    # for user in scrape.select('.username'):
-    #     username_web = user.get_text()
+    for user in scrape.select('.username'):
+        username_web = user.get_text()
 
     for mostplayed in scrape.select('.player-header__left-side'):
         waifu = str(mostplayed)
@@ -54,11 +47,16 @@ def data_request(message, author, id):
     total.append(dict(zip(cas_rank, data)))
 
     try:
-        casual = total[0]['Casual Stats']
-        kd = round(float(casual['K/D Ratio']), 2)
-        wl = round(float(casual['W/L Ratio']), 2)
-        return embed_creator(message, author, profileurl, casual['Time Played'], casual['Kills'], casual['Deaths'],
-                             kd, wl, waifu, waifupicture)
+        if author.lower() == username_web.lower():
+            casual = total[0]['Casual Stats']
+            kd = round(float(casual['K/D Ratio']), 2)
+            wl = round(float(casual['W/L Ratio']), 2)
+            return embed_creator(message, author, profileurl, casual['Time Played'],
+                                 casual['Kills'], casual['Deaths'], kd, wl, waifu,
+                                 waifupicture)
+        else:
+            return error_message(message, author)
+
     except:
         return error_message(message, author)
 
