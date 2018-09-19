@@ -13,7 +13,6 @@ The stats are accessed from R6Stats by using the unique identifier assigned to
 each user (see 'id'). This is stored in the settings.py file.
 """
 
-
 import discord
 import random
 import bs4
@@ -26,7 +25,7 @@ client = discord.Client()
 TOKEN = 'NDkwMTIyNjY1MzM2NTA0MzIy.Dn0uGQ.uokwSV1FgO39Id7exalxEB2AvE0'
 
 
-# Webscraper function, with required arguements passed from the call.
+# Webscraper function, with required arguments passed from the call.
 def data_request(message, author, id):
     # Here the unique identifier is input into the URL to get the correct page
     r = requests.get('https://r6stats.com/stats/{}/'.format(id)).text
@@ -96,7 +95,7 @@ def data_request(message, author, id):
                                  casual['Kills'], casual['Deaths'], kd, wl, waifu,
                                  waifupicture)
         else:
-            # If the usernames don't match, retrun an error message
+            # If the usernames don't match, return an error message
             return error_message(message, author)
 
     except:
