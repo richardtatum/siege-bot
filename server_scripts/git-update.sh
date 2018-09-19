@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script used to update code from the Gitlab repo.
 
-cd /opt/r6bot
+cd /opt/r6stats-discord-bot
 OLD_HEAD=`git rev-parse HEAD`
 
 # Do a git pull with the correct key
