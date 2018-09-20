@@ -15,6 +15,7 @@ import bs4
 import requests
 from settings import users
 from discord.ext.commands import Bot
+from discord import Game
 
 BOT_PREFIX = ('!')
 client = Bot(command_prefix=BOT_PREFIX)
@@ -89,8 +90,9 @@ def data_request(context, casual_ranked, author, id):
             wl = round(float(stats_CR['W/L Ratio']), 2)
 
             # Passes all information to the embed_creator for message creation.
-            return embed_creator(context, author, profileurl, stats_CR['Time Played'],
-                                 stats_CR['Kills'], stats_CR['Deaths'], kd, wl, waifu,
+            return embed_creator(context, casual_ranked, author, profileurl,
+                                 stats_CR['Time Played'], stats_CR['Kills'],
+                                 stats_CR['Deaths'], kd, wl, waifu,
                                  waifupicture)
         else:
             # If the usernames don't match, return an error message
@@ -112,8 +114,8 @@ async def error_message(context, author):
 
 # Embed creator takes the variables established in the webscraper
 # prettyfies the results and sends them as a message.
-async def embed_creator(context, username, profileurl, timeplayed, kills, deaths, kd, wl, waifu, waifupicture):
-    embed=discord.Embed(title="R6 Stats Checker", color=0xe3943c)
+async def embed_creator(context, casual_ranked, username, profileurl, timeplayed, kills, deaths, kd, wl, waifu, waifupicture):
+    embed=discord.Embed(title="R6 Stats Checker | {}".format(casual_ranked.title()), color=0xe3943c)
     embed.set_thumbnail(url=profileurl)
     embed.add_field(name="Username", value=username, inline=True)
     embed.add_field(name="Time Played", value=timeplayed, inline=True)
@@ -171,7 +173,7 @@ async def r6(context, casual_ranked='casual'):
     else:
         print('>Stats check failed. Incorrect argument')
         msg = 'Ahh, not quite {}. Please try again.'.format(context.message.author.mention)
-        msg2 = 'Please note `!R6` takes only `casual` or `ranked` as arguments.'
+        msg2 = '`!R6` takes only `casual` or `ranked` as arguments.'
         await client.say(msg)
         await client.say(msg2)
 
@@ -179,6 +181,7 @@ async def r6(context, casual_ranked='casual'):
 # Helpful message printed when the code is first run
 @client.event
 async def on_ready():
+    await client.change_presence(game=Game(name="with humans"))
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
