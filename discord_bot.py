@@ -2,11 +2,7 @@
 when called.
 
 Options:
-    > !hello - Responds to the author with a 'Hello @name'.
-    > !insult - One line insult, mentioning the author.
-    > !stats - Fake stats call, insults the author.
-    > !r6 - Prints the stats of the author as an embed.
-    > !test - Prints a test line.
+    > !help - Provides a list of available commands.
 
 Note:
 The stats are accessed from R6Stats by using the unique identifier assigned to
@@ -18,15 +14,17 @@ import random
 import bs4
 import requests
 from settings import users
+from discord.ext.commands import Bot
 
-client = discord.Client()
+BOT_PREFIX = ('!')
+client = Bot(command_prefix=BOT_PREFIX)
 
 # This is the Bot Token from Discord.
 TOKEN = 'NDkwMTIyNjY1MzM2NTA0MzIy.Dn0uGQ.uokwSV1FgO39Id7exalxEB2AvE0'
 
 
 # Webscraper function, with required arguments passed from the call.
-def data_request(message, author, id):
+def data_request(context, casual_ranked, author, id):
     # Here the unique identifier is input into the URL to get the correct page
     r = requests.get('https://r6stats.com/stats/{}/'.format(id)).text
     scrape = bs4.BeautifulSoup(r, 'html.parser')
@@ -84,37 +82,37 @@ def data_request(message, author, id):
         # name in settings.py to make sure we aren't posting someone elses details
         if author.lower() == username_web.lower():
             # If the usernames are the same, pick the casual stats from the total dict
-            casual = total[0]['Casual Stats']
+            stats_CR = total[0]['{} Stats'.format(casual_ranked.title())]
 
             # Rounds the K/D & W/L numbers to 2 decimal points for easy digestion
-            kd = round(float(casual['K/D Ratio']), 2)
-            wl = round(float(casual['W/L Ratio']), 2)
+            kd = round(float(stats_CR['K/D Ratio']), 2)
+            wl = round(float(stats_CR['W/L Ratio']), 2)
 
             # Passes all information to the embed_creator for message creation.
-            return embed_creator(message, author, profileurl, casual['Time Played'],
-                                 casual['Kills'], casual['Deaths'], kd, wl, waifu,
+            return embed_creator(context, author, profileurl, stats_CR['Time Played'],
+                                 stats_CR['Kills'], stats_CR['Deaths'], kd, wl, waifu,
                                  waifupicture)
         else:
             # If the usernames don't match, return an error message
-            return error_message(message, author)
+            return error_message(context, author)
 
     except:
         # If the webscraper hasn't collect the correct information, return error.
-        return error_message(message, author)
+        return error_message(context, author)
 
 
 # A fun way of distracting the user if the webscrape fails.
 # round(random) function used to pick a float between 1-5 and round to 2 decimal points.
-async def error_message(message, author):
+async def error_message(context, author):
     msg = 'I can\'t access the R6Stats site right now so I\'ll just guess your K/D instead.'
     msg2 = 'User {} has a KD of {} on Rainbow 6: Siege'.format(author, round(random.uniform(1, 5), 2))
-    await client.send_message(message.channel, msg)
-    await client.send_message(message.channel, msg2)
+    await client.send_message(context.message.channel, msg)
+    await client.send_message(context.message.channel, msg2)
 
 
 # Embed creator takes the variables established in the webscraper
 # prettyfies the results and sends them as a message.
-async def embed_creator(message, username, profileurl, timeplayed, kills, deaths, kd, wl, waifu, waifupicture):
+async def embed_creator(context, username, profileurl, timeplayed, kills, deaths, kd, wl, waifu, waifupicture):
     embed=discord.Embed(title="R6 Stats Checker", color=0xe3943c)
     embed.set_thumbnail(url=profileurl)
     embed.add_field(name="Username", value=username, inline=True)
@@ -126,61 +124,59 @@ async def embed_creator(message, username, profileurl, timeplayed, kills, deaths
     embed.add_field(name="Waifu", value=waifu, inline=False)
     embed.set_image(url=waifupicture)
     embed.set_footer(text="*Is there something wrong with this bot? Please let us know by emailing tough.shit@codeishard.com.*")
-    await client.send_message(message.channel, embed=embed)
+    await client.send_message(context.message.channel, embed=embed)
 
 
-# Function containing the different message options available.
-@client.event
-async def on_message(message):
-    # We do not want the bot to reply to itself
-    if message.author == client.user:
-        return
+# Fun 8Ball call that pulls from a random set of responses.
+@client.command(name='8ball',  # Sets the value to call
+                brief='Answers Yes/No questions',  # Brief supplied when !help is called
+                description='Returns an 8Ball answer',  # Extended explaination when !help 8ball is called
+                aliases=['eight_ball', '8-ball'],  # Alternative values that can be used
+                pass_context=True)  # Passes the client information (username etc)
+async def eight_ball(context):
+    possible_responses = [
+        'That is a resounding no',
+        'It is not looking likely',
+        'Too hard to tell',
+        'It is quite possible',
+        'Definitely',
+    ]
+    # Picks a random option from the respose and posts that along with the users name.
+    await client.say(random.choice(possible_responses) + ', ' + context.message.author.mention)
 
-    # Simple call and response
-    if message.content.startswith('!hello'):
-        msg = 'Hello {0.author.mention}'.format(message)
-        await client.send_message(message.channel, msg)
 
-    # Insults the author. Note '*', markdown works in printed messages.
-    if message.content.startswith('!insult'):
-        msg = 'What the *fuck* is wrong with you {0.author.mention}?'.format(message)
-        await client.send_message(message.channel, msg)
-
-    # Fake stats call.
-    if message.content.startswith('!stats'):
-        msg = 'I checked your stats and honestly {0.author.mention}, they are so bad I don\'t want to print them...'.format(message)
-        await client.send_message(message.channel, msg)
-
-    # Test call, can be used to check the bot is running correctly or test code
-    if message.content.startswith('!test'):
-        msg = 'Test message'
-        await client.send_message(message.channel, msg)
-
-    # Real stats call.
-    if message.content.startswith('!r6') or message.content.startswith('!R6'):
-        # Console print for the log, so you can see who has triggered the bot.
-        print('>Stats check by user ' + str(message.author))
-        # Turns the author name into a string so it can be checked against the list.
-        u = str(message.author)
-
+# R6 stats checker
+@client.command(pass_context=True,
+                aliases=['R6', 'stats', 'Stats'],
+                brief='Use the variable casual/ranked',
+                description='Provides stats from the R6Stats website')
+async def r6(context, casual_ranked='casual'):
+    # Turns the author name into a string so it can be checked against the list.
+    u = str(context.message.author)
+    # Console print for the log, so you can see who has triggered the bot.
+    print('>Stats check by user ' + u)
+    # Checks if the argument called is either of the accepted ones.
+    if casual_ranked.lower() == 'casual' or casual_ranked.lower() == 'ranked':
         # If the author is present in the list, continue with codeself.
         # Otherwise this author hasn't been created. Prompt contact with admin.
         if u in users:
-            # Username_local is stored for checking against the website later.
-            username_local = users[u][0]
-            # This is the ID of the account
-            # To be entered into the URL later to get the correct page.
-            id = users[u][2]
+            username_local = users[u][0]  # Username_local stored for checking later
+            id = users[u][2]  # ID of the account, will be parsed into the URL later
             # Pass this information to the data_request() func.
-            await data_request(message, username_local, id)
-
-        # If user not find, reply with helpful note.
+            await data_request(context, casual_ranked, username_local, id)
         else:
             msg = 'I\'m afraid I don\'t have your ID stored for Rainbow 6. Please speak to Richard to get you added to the list.'
-            await client.send_message(message.channel, msg)
+            await client.say(msg)
+    # If the argument is not one of the two accepted, throws a helpful error message.
+    else:
+        print('>Stats check failed. Incorrect argument')
+        msg = 'Ahh, not quite {}. Please try again.'.format(context.message.author.mention)
+        msg2 = 'Please note `!R6` takes only `casual` or `ranked` as arguments.'
+        await client.say(msg)
+        await client.say(msg2)
 
 
-# Helpful message printed when the code is run
+# Helpful message printed when the code is first run
 @client.event
 async def on_ready():
     print('Logged in as')
