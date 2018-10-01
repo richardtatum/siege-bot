@@ -5,8 +5,8 @@ Options:
     > !help - Provides a list of available commands.
 
 Note:
-The stats are accessed from R6Stats by using the unique identifier assigned to
-each user (see 'id'). This is stored in the settings.py file.
+The stats are accessed from R6Tracker by using the uPlay username.
+This is stored in the settings.py file.
 """
 
 import discord
@@ -21,7 +21,7 @@ BOT_PREFIX = ('!')
 client = Bot(command_prefix=BOT_PREFIX)
 
 # This is the Bot Token from Discord.
-TOKEN = 'NDkwMTIyNjY1MzM2NTA0MzIy.Dn0uGQ.uokwSV1FgO39Id7exalxEB2AvE0'
+TOKEN = 'NDkyMjYyMjM2MzM3OTk1Nzc2.DoUVfg.uXzxTJtrCxHC2zh4a0TvbSesItk'
 
 
 # Webscraper function, with required arguments passed from the call.
@@ -62,6 +62,10 @@ def data_request(context, casual_ranked, author):
             # Strips the string of unnecessary characters and leaves the image url
             profileurl = str(link[link.find('src="')+5:link.find('"/>')])
 
+    # This pulls the username and correct formatting from the website.
+    for username in scrape.select('.trn-profile-header__name'):
+        username_web = str(username.get_text())
+
     # Pulls the name of the most played character from inside an image link.
     for mostplayed in scrape.select('.trn-defstat__value'):
         for source in mostplayed.find_all('img', src=True, limit=1):
@@ -71,25 +75,25 @@ def data_request(context, casual_ranked, author):
             # Takes the operator name and adds it to a URL to pull a picture of that Op
             waifupicture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower())
 
-    try:
+    # try:
         # Pulls the request for casual or ranked stats. Defaulting to casual
         # if no argument is provided
-        requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
-        # If the user has not played ranked/casual then the 'Time Played' stat
-        # is blank. This checks the length and makes it 0 if nothing is there
-        if len(requested_cas_rank['Time Played']) == 0:
-            requested_cas_rank['Time Played'] = 0
+    requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
+    # If the user has not played ranked/casual then the 'Time Played' stat
+    # is blank. This checks the length and makes it 0 if nothing is there
+    if len(requested_cas_rank['Time Played']) == 0:
+        requested_cas_rank['Time Played'] = 0
 
-        # Passes all information to the embed_creator for message creation.
-        return embed_creator(context, casual_ranked, author, profileurl,
-                             requested_cas_rank['Time Played'], requested_cas_rank['Kills'],
-                             requested_cas_rank['Deaths'], requested_cas_rank['KD'],
-                             requested_cas_rank['Win %'], waifu, waifupicture)
+    # Passes all information to the embed_creator for message creation.
+    return embed_creator(context, casual_ranked, username_web, profileurl,
+                         requested_cas_rank['Time Played'], requested_cas_rank['Kills'],
+                         requested_cas_rank['Deaths'], requested_cas_rank['KD'],
+                         requested_cas_rank['Win %'], waifu, waifupicture)
 
-    except:
-        # If the webscraper hasn't collect the correct information, return error.
-        print('>Check failed. Make sure username is correct?')
-        return error_message(context, author)
+    # except:
+    #     # If the webscraper hasn't collect the correct information, return error.
+    #     print('>Check failed. Make sure username is correct?')
+    #     return error_message(context, author)
 
 
 # A fun way of distracting the user if the webscrape fails.
@@ -157,15 +161,26 @@ async def r6(context, casual_ranked='casual'):
             await data_request(context, casual_ranked, username_local)
         else:
             print('>Check failed. Is the username on the list?')
-            msg = 'I\'m afraid I don\'t have your ID stored for Rainbow 6. Please speak to Richard to get you added to the list.'
+            msg = 'I\'m afraid I don\'t have your ID stored for Rainbow 6. \
+                Please speak to Richard to get you added to the list.'
             await client.say(msg)
-    # If the argument is not one of the two accepted, throws a helpful error message.
+
+    # If the argument is not casual/ranked then it expects it to be a username
+    # and passes it as such
     else:
-        print('>Stats check failed. Incorrect argument')
-        msg = 'Ahh, not quite {}. Please try again.'.format(context.message.author.mention)
-        msg2 = '`!R6` takes only `casual` or `ranked` as arguments.'
-        await client.say(msg)
-        await client.say(msg2)
+        username_local = casual_ranked.lower()
+        casual_ranked = 'casual'
+        try:
+            await data_request(context, casual_ranked, username_local)
+        except:
+            print('>Stats check failed. Argument error.')
+            msg = 'Ahh, I\'m sorry {} there was an error. Please try again.'\
+                  .format(context.message.author.mention)
+            msg2 = ('`!R6` takes `casual` or `ranked` to check your own stats, '
+                    'or a username to check someone elses. If you got this error '
+                    'after trying someone elses username, please check the spelling.')
+            await client.say(msg)
+            await client.say(msg2)
 
 
 # Helpful message printed when the code is first run
@@ -176,9 +191,13 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    await client.send_message(client.get_channel('476357549126582272'), 'R6 BOT UPDATED.')
-    await client.send_message(client.get_channel('476357549126582272'), 'INITIALISING...')
-    await client.send_message(client.get_channel('476357549126582272'), 'https://giphy.com/gifs/style-power-mech-4Kn78njYS85W0')
-    await client.send_message(client.get_channel('476357549126582272'), 'R6BOT IS BACK BABY. CHECK YO\' SELF.')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'R6 BOT UPDATED.')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'INITIALISING...')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'https://giphy.com/gifs/style-power-mech-4Kn78njYS85W0')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'R6BOT IS BACK BABY. CHECK YO\' SELF.')
 
 client.run(TOKEN)
