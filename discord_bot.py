@@ -21,7 +21,7 @@ BOT_PREFIX = ('!')
 client = Bot(command_prefix=BOT_PREFIX)
 
 # This is the Bot Token from Discord.
-TOKEN = test_token
+TOKEN = production_token
 
 
 # Webscraper function, with required arguments passed from the call.
