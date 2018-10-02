@@ -21,7 +21,7 @@ BOT_PREFIX = ('!')
 client = Bot(command_prefix=BOT_PREFIX)
 
 # This is the Bot Token from Discord.
-TOKEN = test_token
+TOKEN = production_token
 
 
 # Webscraper function, with required arguments passed from the call.
@@ -191,13 +191,13 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    # await client.send_message(client.get_channel('476357549126582272'),
-    #                           'R6 BOT UPDATED.')
-    # await client.send_message(client.get_channel('476357549126582272'),
-    #                           'INITIALISING...')
-    # await client.send_message(client.get_channel('476357549126582272'),
-    #                           'https://giphy.com/gifs/style-power-mech-4Kn78njYS85W0')
-    # await client.send_message(client.get_channel('476357549126582272'),
-    #                           'R6BOT IS BACK BABY. CHECK YO\' SELF.')
+    await client.send_message(client.get_channel('476357549126582272'),
+                              'R6 BOT UPDATED.')
+    await client.send_message(client.get_channel('476357549126582272'),
+                              'INITIALISING...')
+    await client.send_message(client.get_channel('476357549126582272'),
+                              'https://giphy.com/gifs/style-power-mech-4Kn78njYS85W0')
+    await client.send_message(client.get_channel('476357549126582272'),
+                              'R6BOT IS BACK BABY. CHECK YO\' SELF.')
 
 client.run(TOKEN)
