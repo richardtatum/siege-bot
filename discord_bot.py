@@ -13,7 +13,7 @@ import discord
 import random
 import bs4
 import requests
-from settings import users
+from settings import users, production_token, test_token
 from discord.ext.commands import Bot
 from discord import Game
 
@@ -21,81 +21,28 @@ BOT_PREFIX = ('!')
 client = Bot(command_prefix=BOT_PREFIX)
 
 # This is the Bot Token from Discord.
-TOKEN = 'NDkwMTIyNjY1MzM2NTA0MzIy.Dn0uGQ.uokwSV1FgO39Id7exalxEB2AvE0'
+TOKEN = test_token
 
 
 # Webscraper function, with required arguments passed from the call.
-def data_request(context, casual_ranked, username_local):
+async def data_request(context, casual_ranked, username_local):
     # Here the unique identifier is input into the URL to get the correct page
     r = requests.get('https://r6.tracker.network/profile/pc/{}'.format(username_local.lower()))
     scrape = bs4.BeautifulSoup(r.text, 'html.parser')
 
     if r.status_code == 200:
-
-        label = []  # Blank list for the stat labels
-        count = []  # Blank list for the stat numbers
-        data = []  # Blank list for the combination of the two previous
-        cas_rank = []  # Blank list stores casual/ranked stats
-        total = []  # Blank list for the zip total of all lists
-
-        # Webscraper passes through classes picking up the correct information
-        # And assigns them to the blank lists for manipulation later.
-        for element in scrape.select('.r6-pvp-grid'):
-            for c_r in element.select('.trn-card__header'):
-                cas_rank.append(c_r.get_text(strip=True))
-
-            for stats_type in element.select('.trn-card__content'):
-                for stats_list in stats_type.select('.trn-defstats'):
-                    for stat_label in stats_list.select('.trn-defstat__name'):
-                        label.append(stat_label.get_text(strip=True))
-                    for stat_count in stats_list.select('.trn-defstat__value'):
-                        count.append(stat_count.get_text(strip=True))
-                        # strip=True removes the '\n' new lines present in the list
-                data.append(dict(zip(label, count)))
-
-        # Takes all the data and zips into one easy to use dict.
-        total.append(dict(zip(cas_rank, data)))
-
-        # Pulls the users uPlay profile image
-        for profile in scrape.select('.trn-profile-header__avatar'):
-            for link in profile.find_all('img', src=True):
-                link = str(link)
-                # Strips the string of unnecessary characters and leaves the image url
-                profileurl = str(link[link.find('src="')+5:link.find('"/>')])
-
-        # This pulls the username and correct formatting from the website.
-        for username in scrape.select('.trn-profile-header__name'):
-            username_web = str(username.get_text())
-
-        # Pulls the name of the most played character from inside an image link.
-        for mostplayed in scrape.select('.trn-defstat__value'):
-            for source in mostplayed.find_all('img', src=True, limit=1):
-                source = str(source)
-                # Strips the string of unnecessary characters and leaves the Operator name
-                waifu = str(source[source.find('title="')+7:source.find('"/>')]).title()
-                # Takes the operator name and adds it to a URL to pull a picture of that Op
-                waifupicture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower())
-
-        requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
-        # If the user has not played ranked/casual then the 'Time Played' stat
-        # is blank. This checks the length and makes it 0 if nothing is there
-        if len(requested_cas_rank['Time Played']) == 0:
-            requested_cas_rank['Time Played'] = 0
-
-        # Passes all information to the embed_creator for message creation.
-        return embed_creator(context, casual_ranked, username_web, profileurl,
-                             requested_cas_rank['Time Played'], requested_cas_rank['Kills'],
-                             requested_cas_rank['Deaths'], requested_cas_rank['KD'],
-                             requested_cas_rank['Win %'], waifu, waifupicture)
+        # If the connection is successful, begin scrape
+        await webscrape(context, casual_ranked, scrape)
 
     elif r.status_code == 404:
         # If the webscraper hasn't collect the correct information, return error.
         print('>Check failed. 404 on the username.')
-        return error_message_404(context, username_local)
+        await error_message_404(context, username_local)
 
     else:
+        # Handles errors other than 404.
         print('Check failed. Not 404.')
-        return error_message(context, username_local)
+        await error_message(context, username_local)
 
 
 # A fun way of distracting the user if the webscrape fails.
@@ -112,6 +59,61 @@ async def error_message_404(context, author):
     msg2 = 'Please check the spelling and try again.'
     await client.send_message(context.message.channel, msg)
     await client.send_message(context.message.channel, msg2)
+
+
+async def webscrape(context, casual_ranked, scrape):
+    # Creates blank lists for storing required data.
+    label, count, data, cas_rank, total = [[] for i in range(5)]
+
+    # Webscraper passes through classes picking up the correct information
+    # And assigns them to the blank lists for manipulation later.
+    for element in scrape.select('.r6-pvp-grid'):
+        for c_r in element.select('.trn-card__header'):
+            cas_rank.append(c_r.get_text(strip=True))
+
+        for stats_type in element.select('.trn-card__content'):
+            for stats_list in stats_type.select('.trn-defstats'):
+                for stat_label in stats_list.select('.trn-defstat__name'):
+                    label.append(stat_label.get_text(strip=True))
+                for stat_count in stats_list.select('.trn-defstat__value'):
+                    count.append(stat_count.get_text(strip=True))
+                    # strip=True removes the '\n' new lines present in the list
+            data.append(dict(zip(label, count)))
+
+    # Takes all the data and zips into one easy to use dict.
+    total.append(dict(zip(cas_rank, data)))
+
+    # Pulls the users uPlay profile image
+    for profile in scrape.select('.trn-profile-header__avatar'):
+        for link in profile.find_all('img', src=True):
+            link = str(link)
+            # Strips the string of unnecessary characters and leaves the image url
+            profileurl = str(link[link.find('src="')+5:link.find('"/>')])
+
+    # This pulls the username and correct formatting from the website.
+    for username in scrape.select('.trn-profile-header__name'):
+        username_web = str(username.get_text())
+
+    # Pulls the name of the most played character from inside an image link.
+    for mostplayed in scrape.select('.trn-defstat__value'):
+        for source in mostplayed.find_all('img', src=True, limit=1):
+            source = str(source)
+            # Strips the string of unnecessary characters and leaves the Operator name
+            waifu = str(source[source.find('title="')+7:source.find('"/>')]).title()
+            # Takes the operator name and adds it to a URL to pull a picture of that Op
+            waifupicture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower())
+
+    requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
+    # If the user has not played ranked/casual then the 'Time Played' stat
+    # is blank. This checks the length and makes it 0 if nothing is there
+    if len(requested_cas_rank['Time Played']) == 0:
+        requested_cas_rank['Time Played'] = 0
+
+    # Passes all information to the embed_creator for message creation.
+    await embed_creator(context, casual_ranked, username_web, profileurl,
+                         requested_cas_rank['Time Played'], requested_cas_rank['Kills'],
+                         requested_cas_rank['Deaths'], requested_cas_rank['KD'],
+                         requested_cas_rank['Win %'], waifu, waifupicture)
 
 
 # Embed creator takes the variables established in the webscraper
@@ -189,13 +191,13 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'R6 BOT UPDATED.')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'INITIALISING...')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'https://giphy.com/gifs/style-power-mech-4Kn78njYS85W0')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'R6BOT IS BACK BABY. CHECK YO\' SELF.')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'R6 BOT UPDATED.')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'INITIALISING...')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'https://giphy.com/gifs/style-power-mech-4Kn78njYS85W0')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'R6BOT IS BACK BABY. CHECK YO\' SELF.')
 
 client.run(TOKEN)
