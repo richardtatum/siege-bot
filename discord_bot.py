@@ -41,11 +41,11 @@ async def data_request(context, casual_ranked, username_local):
 
     else:
         # Handles errors other than 404.
-        print('Check failed. Not 404.')
+        print('>Check failed. Not 404.')
         await error_message(context, username_local)
 
 
-# A fun way of distracting the user if the webscrape fails.
+# A fun way of distracting the user if the webscrape fails with a non-404 error.
 # round(random) function used to pick a float between 1-5 and round to 2 decimal points.
 async def error_message(context, author):
     msg = 'I can\'t access the R6Tracker site right now so I\'ll just guess your K/D instead.'
@@ -54,8 +54,9 @@ async def error_message(context, author):
     await client.send_message(context.message.channel, msg2)
 
 
+# Provides an error message whent the website responds with a 404
 async def error_message_404(context, author):
-    msg = 'User {} does not exist or the website is displaying a 404 error.'.format(author.title())
+    msg = 'Either user {} does not exist or the website is displaying a 404 error.'.format(author.title())
     msg2 = 'Please check the spelling and try again.'
     await client.send_message(context.message.channel, msg)
     await client.send_message(context.message.channel, msg2)
@@ -111,9 +112,9 @@ async def webscrape(context, casual_ranked, scrape):
 
     # Passes all information to the embed_creator for message creation.
     await embed_creator(context, casual_ranked, username_web, profileurl,
-                         requested_cas_rank['Time Played'], requested_cas_rank['Kills'],
-                         requested_cas_rank['Deaths'], requested_cas_rank['KD'],
-                         requested_cas_rank['Win %'], waifu, waifupicture)
+                        requested_cas_rank['Time Played'], requested_cas_rank['Kills'],
+                        requested_cas_rank['Deaths'], requested_cas_rank['KD'],
+                        requested_cas_rank['Win %'], waifu, waifupicture)
 
 
 # Embed creator takes the variables established in the webscraper
@@ -134,35 +135,16 @@ async def embed_creator(context, casual_ranked, username, profileurl, timeplayed
     await client.send_message(context.message.channel, embed=embed)
 
 
-# Fun 8Ball call that pulls from a random set of responses.
-@client.command(name='8ball',  # Sets the value to call
-                brief='Answers Yes/No questions',  # Brief supplied when !help is called
-                description='Returns an 8Ball answer',  # Extended explaination when !help 8ball is called
-                aliases=['eight_ball', '8-ball'],  # Alternative values that can be used
-                pass_context=True)  # Passes the client information (username etc)
-async def eight_ball(context):
-    possible_responses = [
-        'That is a resounding no',
-        'It is not looking likely',
-        'Too hard to tell',
-        'It is quite possible',
-        'Definitely',
-    ]
-    # Picks a random option from the respose and posts that along with the users name.
-    await client.say(random.choice(possible_responses) + ', ' + context.message.author.mention)
-
-
 # R6 stats checker
 @client.command(pass_context=True,
                 aliases=['R6', 'stats', 'Stats'],
-                brief='Use the variable casual/ranked',
+                brief='Use the argument casual/ranked or a uplay username',
                 description='Provides stats from the R6Stats website')
 async def r6(context, casual_ranked='casual'):
-    # Turns the author name into a string so it can be checked against the list.
-    u = str(context.message.author)
-    # Console print for the log, so you can see who has triggered the bot.
+    # Turns the author name into a string so it can be checked against the list
+    u = str(context.message.author)  # Print for the log showing who triggered the bot.
     print('>Stats check by user ' + u + ' | ' + casual_ranked.title())
-    # Checks if the argument called is either of the accepted ones.
+    # Checks if the argument called is either casual or ranked.
     if casual_ranked.lower() == 'casual' or casual_ranked.lower() == 'ranked':
         # If the author is present in the list, continue with codeself.
         # Otherwise this author hasn't been created. Prompt contact with admin.
@@ -173,7 +155,7 @@ async def r6(context, casual_ranked='casual'):
         else:
             print('>Check failed. Is the username on the list?')
             msg = 'I\'m afraid I don\'t have your ID stored for Rainbow 6. \
-                Please speak to Richard to get you added to the list.'
+                Please speak to the admin to get you added to the list.'
             await client.say(msg)
 
     # If the argument is not casual/ranked then it expects it to be a username
@@ -183,21 +165,16 @@ async def r6(context, casual_ranked='casual'):
         casual_ranked = 'casual'
         await data_request(context, casual_ranked, username_local)
 
+
 # Helpful message printed when the code is first run
 @client.event
 async def on_ready():
     await client.change_presence(game=Game(name="with humans"))
-    print('Logged in as')
+    print('Logged in as:')
     print(client.user.name)
     print(client.user.id)
     print('------')
     await client.send_message(client.get_channel('476357549126582272'),
-                              'R6 BOT UPDATED.')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'INITIALISING...')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'https://giphy.com/gifs/style-power-mech-4Kn78njYS85W0')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'R6BOT IS BACK BABY. CHECK YO\' SELF.')
+                              'Update completed. R6Bot back online.')
 
 client.run(TOKEN)
