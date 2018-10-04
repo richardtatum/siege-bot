@@ -2,9 +2,14 @@
 
 The bot scrapes user data from r6.tracker.network and provides it in a nice embed within Discord.
 
+## Prior Note
+This is my first Discord Bot. There are many other R6 Stats bots out there that are probably infinitely better. This was simply a learning exercise and a cool little project.
+
+
 ## Installation
 
 Simply clone the repository.
+
 
 ## Discord Prerequisites
 
@@ -24,6 +29,7 @@ After creating app, on the app details page, scroll down to the section named bo
 
 Visit the URL https://discordapp.com/oauth2/authorize?client_id=XXXXXXXXXXXX&scope=bot but replace XXXX with your app client ID. Choose the server you want to add it to and select authorize.
 
+
 ## Code Prerequisites
 
 ### Modules
@@ -36,7 +42,7 @@ pip install -r /path/to/requirements.txt
 
 ### Authorised users
 
-Add any server members and their uPlay account names the `Users` section in `settings.py`:
+Add any server members and their uPlay account names the `users` section in `settings.py`:
 
 ```
 users = {
@@ -54,6 +60,7 @@ Add the previously saved server token in `settings.py`:
 production_token = 'xxxXxxXxx.xxxxx.xxxxxXXxxXXxXXXXx'
 ```
 
+
 ## Running the script & use within Discord
 
 ### Script
@@ -69,7 +76,7 @@ BOTID6337995776
 
 Go to your server and make sure the bot is correctly logged in:
 
-![Bot online](https://imgur.com/SJZuRQ0)
+![](https://imgur.com/SJZuRQ0)
 
 When the bot is activated by a user it will list a helpful message:
 
@@ -98,21 +105,21 @@ If the bot is correctly up and running you can activate it the following:
 Takes the users name and checks it against the list. If the name matches it will return casual stats based on the uPlay username submitted.
 This defaults to casual stats.
 
-![!stats](https://imgur.com/Xaa9WLP)
+![](https://imgur.com/Xaa9WLP)
 
 ```
 !r6/!stats followed by casual or ranked
 ```
 Once again checks the username against the list and if it matches it will return the requested statistics.
 
-![!stats ranked](https://imgur.com/JV6pbqx)
+![](https://imgur.com/JV6pbqx)
 
 ```
 !r6/!stats followed by a username
 ```
 Searches for the username on the stats website, and returns their casual stats if possible. Otherwise returns an error message.
 
-![!stats CSL619](https://imgur.com/KE7I8dg)
+![](https://imgur.com/KE7I8dg)
 
 
 ## Built With
@@ -135,5 +142,4 @@ This project is licensed under the MIT License.
 ## Acknowledgments
 
 * Devdungeon for instructions on setting up the bot - [Dev_Dungeon](https://www.devdungeon.com)
-* Countless other Rainbow Six: Siege bots out there
-* etc
+* Countless other Rainbow Six: Siege bots out there that are infinitely better.
