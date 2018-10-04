@@ -80,7 +80,7 @@ Go to your server and make sure the bot is correctly logged in:
 
 ![](https://imgur.com/SJZuRQ0.png)
 
-When the bot is activated by a user it will list a helpful message:
+When the bot is activated by a user it will print a helpful message in the terminal:
 
 ```
 Logged in as:
@@ -99,7 +99,7 @@ Including if something didn't go to plan:
 
 ### Discord
 
-If the bot is correctly up and running you can activate it the following:
+If the bot is correctly up and running you can activate it with the following command:
 
 ```
 !r6 or !stats
