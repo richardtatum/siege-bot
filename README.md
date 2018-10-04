@@ -32,12 +32,14 @@ Visit the URL https://discordapp.com/oauth2/authorize?client_id=XXXXXXXXXXXX&sco
 
 ## Code Prerequisites
 
+This script requires Python 3.6 or above.
+
 ### Modules
 
 Install all the modules in `requirements.txt`:
 
 ```
-pip install -r /path/to/requirements.txt
+pip3 install -r /path/to/requirements.txt
 ```
 
 ### Authorised users
@@ -65,7 +67,7 @@ production_token = 'xxxXxxXxx.xxxxx.xxxxxXXxxXXxXXXXx'
 
 ### Script
 
-Run `discord_bot.py` once the prerequisites have been completed and you should be greeted with the following:
+Run `python3 discord_bot.py` once the prerequisites have been completed and you should be greeted with the following:
 
 ```
 Logged in as:
