@@ -105,21 +105,21 @@ If the bot is correctly up and running you can activate it the following:
 Takes the users name and checks it against the list. If the name matches it will return casual stats based on the uPlay username submitted.
 This defaults to casual stats.
 
-![](https://imgur.com/Xaa9WLP)
+![](https://imgur.com/Xaa9WLP/png)
 
 ```
 !r6/!stats followed by casual or ranked
 ```
 Once again checks the username against the list and if it matches it will return the requested statistics.
 
-![](https://imgur.com/JV6pbqx)
+![](https://imgur.com/JV6pbqx.png)
 
 ```
 !r6/!stats followed by a username
 ```
 Searches for the username on the stats website, and returns their casual stats if possible. Otherwise returns an error message.
 
-![](https://imgur.com/KE7I8dg)
+![](https://imgur.com/KE7I8dg.png)
 
 
 ## Built With
