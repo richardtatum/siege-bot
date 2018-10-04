@@ -78,7 +78,7 @@ BOTID6337995776
 
 Go to your server and make sure the bot is correctly logged in:
 
-![](https://imgur.com/SJZuRQ0)
+![](https://imgur.com/SJZuRQ0.png)
 
 When the bot is activated by a user it will list a helpful message:
 
@@ -134,7 +134,7 @@ Searches for the username on the stats website, and returns their casual stats i
 
 * **Richard Tatum** - *Initial work* - [TTKMHN](https://gitlab.com/TTKMHN)
 * **Josh Edney** - *Server scripts* - [FluffBunker](https://gitlab.com/FluffBunker)
-* **Chris Lowe** - *Code Review* - [CSL619](https://gitlab.com/CSL619)
+* **Chris Lowe** - *Code review* - [CSL619](https://gitlab.com/CSL619)
 
 ## License
 
