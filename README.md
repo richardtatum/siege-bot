@@ -44,7 +44,7 @@ pip install -r /path/to/requirements.txt
 
 Add any server members and their uPlay account names the `users` section in `settings.py`:
 
-```
+```python
 users = {
     'discordusername#2312': ['uPlayusername'],
     'CSL619#8493': ['CSL619'],
@@ -56,7 +56,7 @@ users = {
 ### Server Token
 Add the previously saved server token in `settings.py`:
 
-```
+```python
 production_token = 'xxxXxxXxx.xxxxx.xxxxxXXxxXXxXXXXx'
 ```
 
@@ -105,7 +105,7 @@ If the bot is correctly up and running you can activate it the following:
 Takes the users name and checks it against the list. If the name matches it will return casual stats based on the uPlay username submitted.
 This defaults to casual stats.
 
-![](https://imgur.com/Xaa9WLP/png)
+![](https://imgur.com/Xaa9WLP.png)
 
 ```
 !r6/!stats followed by casual or ranked
