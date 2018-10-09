@@ -64,25 +64,20 @@ async def error_message_404(context, author):
 
 async def webscrape(context, casual_ranked, scrape):
     # Creates blank lists for storing required data.
-    label, count, data, cas_rank, total = [[] for i in range(5)]
+    label, count, data, total = [[] for i in range(4)]
 
-    # Webscraper passes through classes picking up the correct information
-    # And assigns them to the blank lists for manipulation later.
-    for element in scrape.select('.r6-pvp-grid'):
-        for c_r in element.select('.trn-card__header'):
-            cas_rank.append(c_r.get_text(strip=True))
+    cas_rank_gen = ['Empty', 'Overview', 'Overview2', 'Current Operation', 'General', 'Casual', 'Ranked']
 
-        for stats_type in element.select('.trn-card__content'):
-            for stats_list in stats_type.select('.trn-defstats'):
-                for stat_label in stats_list.select('.trn-defstat__name'):
-                    label.append(stat_label.get_text(strip=True))
-                for stat_count in stats_list.select('.trn-defstat__value'):
-                    count.append(stat_count.get_text(strip=True))
-                    # strip=True removes the '\n' new lines present in the list
-            data.append(dict(zip(label, count)))
+    for element in scrape.select('.trn-scont__content'):
+            for gen in element.select('.trn-card__content'):
+                for stats_list in gen.select('.trn-defstats'):
+                    for stat_label in stats_list.select('.trn-defstat__name'):
+                        label.append(stat_label.get_text(strip=True))
+                    for stat_count in stats_list.select('.trn-defstat__value'):
+                        count.append(stat_count.get_text(strip=True))
+                data.append(dict(zip(label, count)))
 
-    # Takes all the data and zips into one easy to use dict.
-    total.append(dict(zip(cas_rank, data)))
+    total.append(dict(zip(cas_rank_gen, data)))
 
     # Pulls the users uPlay profile image
     for profile in scrape.select('.trn-profile-header__avatar'):
@@ -102,7 +97,7 @@ async def webscrape(context, casual_ranked, scrape):
             # Strips the string of unnecessary characters and leaves the Operator name
             waifu = str(source[source.find('title="')+7:source.find('"/>')]).title()
             # Takes the operator name and adds it to a URL to pull a picture of that Op
-            waifupicture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower())
+            waifupicture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
 
     requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
     # If the user has not played ranked/casual then the 'Time Played' stat
@@ -140,12 +135,12 @@ async def embed_creator(context, casual_ranked, username, profileurl, timeplayed
                 aliases=['R6', 'stats', 'Stats'],
                 brief='Use the argument casual/ranked or a uplay username',
                 description='Provides stats from the R6Stats website')
-async def r6(context, casual_ranked='casual'):
+async def r6(context, casual_ranked='general', search_cas_rank='general'):
     # Turns the author name into a string so it can be checked against the list
     u = str(context.message.author)  # Print for the log showing who triggered the bot.
     print('>Stats check by user ' + u + ' | ' + casual_ranked.title())
     # Checks if the argument called is either casual or ranked.
-    if casual_ranked.lower() == 'casual' or casual_ranked.lower() == 'ranked':
+    if casual_ranked.lower() in {'casual', 'ranked', 'general'}:
         # If the author is present in the list, continue with codeself.
         # Otherwise this author hasn't been created. Prompt contact with admin.
         if u in users:
@@ -162,8 +157,15 @@ async def r6(context, casual_ranked='casual'):
     # and passes it as such
     else:
         username_local = casual_ranked.lower()
-        casual_ranked = 'casual'
-        await data_request(context, casual_ranked, username_local)
+        if search_cas_rank in {'casual', 'ranked', 'general'}:
+            casual_ranked = search_cas_rank
+            await data_request(context, casual_ranked, username_local)
+        else:
+            print('>Attempted user search but passed something other than casual, ranked or general.')
+            msg = 'When searching for a user, please only pass `casual`, `ranked`, or `general` as additional arguments.'
+            msg2 = 'Please try again.'
+            await client.say(msg)
+            await client.say(msg2)
 
 
 # Helpful message printed when the code is first run
