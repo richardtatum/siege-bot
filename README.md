@@ -67,7 +67,12 @@ production_token = 'xxxXxxXxx.xxxxx.xxxxxXXxxXXxXXXXx'
 
 ### Script
 
-Run `python3 discord_bot.py` once the prerequisites have been completed and you should be greeted with the following:
+Run:
+
+```
+python3 discord_bot.py
+```
+in the terminal, once the prerequisites have been completed, and you should be greeted with the following:
 
 ```
 Logged in as:
@@ -104,13 +109,13 @@ If the bot is correctly up and running you can activate it with the following co
 ```
 !r6 or !stats
 ```
-Takes the users name and checks it against the list. If the name matches it will return casual stats based on the uPlay username submitted.
-This defaults to casual stats.
+Takes the users name and checks it against the list. If the name matches it will return stats based on the uPlay username submitted.
+This defaults to `general` stats.
 
-![](https://imgur.com/Xaa9WLP.png)
+![](https://imgur.com/p8TR7Qr.png)
 
 ```
-!r6/!stats followed by casual or ranked
+!r6/!stats followed by general, casual or ranked
 ```
 Once again checks the username against the list and if it matches it will return the requested statistics.
 
@@ -119,10 +124,16 @@ Once again checks the username against the list and if it matches it will return
 ```
 !r6/!stats followed by a username
 ```
-Searches for the username on the stats website, and returns their casual stats if possible. Otherwise returns an error message.
+Searches for the username on the stats website, and returns their `general` stats if possible. Otherwise returns an error message.
 
-![](https://imgur.com/KE7I8dg.png)
+![](https://imgur.com/7SY1oaw.png)
 
+```
+!r6/!stats followed by a username, followed by general, casual or ranked
+```
+Once again checks the username on the stats website,and if it matches it will return the requested statistics.
+
+![](https://imgur.com/BHIZrOv.png)
 
 ## Built With
 * [Discord](https://discordpy.readthedocs.io/en/latest/index.html) - The framework used
