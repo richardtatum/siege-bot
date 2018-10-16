@@ -157,8 +157,8 @@ async def r6(context, casual_ranked='general', search_cas_rank='general'):
     # and passes it as such
     else:
         username_local = casual_ranked.lower()
-        if search_cas_rank in {'casual', 'ranked', 'general'}:
-            casual_ranked = search_cas_rank
+        if search_cas_rank.lower() in {'casual', 'ranked', 'general'}:
+            casual_ranked = search_cas_rank.lower()
             await data_request(context, casual_ranked, username_local)
         else:
             print('>Attempted user search but passed something other than casual, ranked or general.')
