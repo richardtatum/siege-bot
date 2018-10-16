@@ -27,7 +27,8 @@ TOKEN = production_token
 # Webscraper function, with required arguments passed from the call.
 async def data_request(context, casual_ranked, username_local):
     # Here the unique identifier is input into the URL to get the correct page
-    r = requests.get('https://r6.tracker.network/profile/pc/{}'.format(username_local.lower()))
+    r = requests.get('https://r6.tracker.network/profile/pc/{}'.
+                     format(username_local.lower()))
     scrape = bs4.BeautifulSoup(r.text, 'html.parser')
 
     if r.status_code == 200:
@@ -56,7 +57,8 @@ async def error_message(context, author):
 
 # Provides an error message whent the website responds with a 404
 async def error_message_404(context, author):
-    msg = 'Either user {} does not exist or the website is displaying a 404 error.'.format(author.title())
+    msg = ('Either user {} does not exist or the website is '
+           'displaying a 404 error.'.format(author.title()))
     msg2 = 'Please check the spelling and try again.'
     await client.send_message(context.message.channel, msg)
     await client.send_message(context.message.channel, msg2)
@@ -64,7 +66,7 @@ async def error_message_404(context, author):
 
 async def webscrape(context, casual_ranked, scrape):
     # Creates blank lists for storing required data.
-    label, count, data, total = [[] for i in range(4)]
+    label, count, data, total, = [[] for i in range(4)]
 
     cas_rank_gen = ['Empty', 'Overview', 'Overview2', 'Current Operation', 'General', 'Casual', 'Ranked']
 
@@ -84,7 +86,13 @@ async def webscrape(context, casual_ranked, scrape):
         for link in profile.find_all('img', src=True):
             link = str(link)
             # Strips the string of unnecessary characters and leaves the image url
-            profileurl = str(link[link.find('src="')+5:link.find('"/>')])
+            profile_url = str(link[link.find('src="')+5:link.find('"/>')])
+
+    for rating in scrape.find_all(style='width: 50px; margin-right: 14px;'):
+        for rank in rating.select('img'):
+            current_rank = rank['title']
+
+    # print(scrape.find(style='width: 50px; margin-right: 14px;')['title'])
 
     # This pulls the username and correct formatting from the website.
     for username in scrape.select('.trn-profile-header__name'):
@@ -97,7 +105,7 @@ async def webscrape(context, casual_ranked, scrape):
             # Strips the string of unnecessary characters and leaves the Operator name
             waifu = str(source[source.find('title="')+7:source.find('"/>')]).title()
             # Takes the operator name and adds it to a URL to pull a picture of that Op
-            waifupicture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
+            waifu_picture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
 
     requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
     # If the user has not played ranked/casual then the 'Time Played' stat
@@ -106,25 +114,29 @@ async def webscrape(context, casual_ranked, scrape):
         requested_cas_rank['Time Played'] = 0
 
     # Passes all information to the embed_creator for message creation.
-    await embed_creator(context, casual_ranked, username_web, profileurl,
+    await embed_creator(context, casual_ranked, username_web, profile_url,
                         requested_cas_rank['Time Played'], requested_cas_rank['Kills'],
                         requested_cas_rank['Deaths'], requested_cas_rank['KD'],
-                        requested_cas_rank['Win %'], waifu, waifupicture)
+                        requested_cas_rank['Win %'], waifu, waifu_picture, current_rank)
 
 
 # Embed creator takes the variables established in the webscraper
 # prettyfies the results and sends them as a message.
-async def embed_creator(context, casual_ranked, username, profileurl, timeplayed, kills, deaths, kd, wl, waifu, waifupicture):
-    embed=discord.Embed(title="R6 Stats Checker | {}".format(casual_ranked.title()), color=0xe3943c)
-    embed.set_thumbnail(url=profileurl)
+async def embed_creator(context, casual_ranked, username, profile_url,
+                        time_played, kills, deaths, kd, wl, waifu,
+                        waifu_picture, current_rank):
+    embed=discord.Embed(title="R6 Stats Checker | {}".
+                        format(casual_ranked.title()), color=0xe3943c)
+    embed.set_thumbnail(url=profile_url)
     embed.add_field(name="Username", value=username, inline=True)
-    embed.add_field(name="Time Played", value=timeplayed, inline=True)
+    embed.add_field(name="Time Played", value=time_played, inline=True)
     embed.add_field(name="Kills", value=kills, inline=True)
     embed.add_field(name="Deaths", value=deaths, inline=True)
     embed.add_field(name="K/D Ratio", value=kd, inline=True)
     embed.add_field(name="W/L %", value=wl, inline=True)
-    embed.add_field(name="Waifu", value=waifu, inline=False)
-    embed.set_image(url=waifupicture)
+    embed.add_field(name="Waifu", value=waifu, inline=True)
+    embed.add_field(name="Rank", value=current_rank, inline=True)
+    embed.set_image(url=waifu_picture)
     embed.set_footer(text="*Is there something wrong with this bot? Please let us know by \
     emailing tough.shit@codeishard.com.*")
     await client.send_message(context.message.channel, embed=embed)
