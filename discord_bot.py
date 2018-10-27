@@ -88,9 +88,13 @@ async def webscrape(context, casual_ranked, scrape):
             # Strips the string of unnecessary characters and leaves the image url
             profile_url = str(link[link.find('src="')+5:link.find('"/>')])
 
+    # Default status is unranked.
+    current_rank = 'Not Ranked'
     for rating in scrape.find_all(style='width: 50px; margin-right: 14px;'):
         for rank in rating.select('img'):
             current_rank = rank['title']
+
+
 
     # print(scrape.find(style='width: 50px; margin-right: 14px;')['title'])
 
