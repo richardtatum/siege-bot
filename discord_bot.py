@@ -66,7 +66,7 @@ async def error_message_404(context, author):
 
 async def webscrape(context, casual_ranked, scrape):
     # Creates blank lists for storing required data.
-    label, count, data, total, = [[] for i in range(4)]
+    label, count, data, total = [[] for i in range(4)]
 
     cas_rank_gen = ['Empty', 'Overview', 'Overview2', 'Current Operation', 'General', 'Casual', 'Ranked']
 
@@ -162,7 +162,15 @@ async def r6(context, casual_ranked='general', search_cas_rank='general'):
         if u in users:
             username_local = users[u][0]  # username_local stored for checking later
             # Pass this information to the data_request() func.
+            issue = ('**Please Note:** Some stats are frozen at the moment '
+                     'because of a problem with the way Ubisoft writes code. '
+                     'They\'re aware of the issue and are (apparently) '
+                     'working on fixing it.')
+            issue2 = ('If your request is urgent, tough shit. We will let you '
+                      'know when it is fixed.')
+            await client.say(issue)
             await data_request(context, casual_ranked, username_local)
+            await client.say(issue2)
         else:
             print('>Check failed. Is the username on the list?')
             msg = 'I\'m afraid I don\'t have your ID stored for Rainbow 6. \
