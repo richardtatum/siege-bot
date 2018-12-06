@@ -13,7 +13,7 @@ import discord
 import random
 import bs4
 import requests
-from settings import users, production_token, test_token
+from settings import users, production, test
 from discord.ext.commands import Bot
 from discord import Game
 
@@ -21,7 +21,7 @@ BOT_PREFIX = ('!')
 client = Bot(command_prefix=BOT_PREFIX)
 
 # This is the Bot Token from Discord.
-TOKEN = production_token
+TOKEN = production
 
 
 # Webscraper function, with required arguments passed from the call.
@@ -84,9 +84,15 @@ async def webscrape(context, casual_ranked, scrape):
     # Pulls the users uPlay profile image
     for profile in scrape.select('.trn-profile-header__avatar'):
         for link in profile.find_all('img', src=True):
-            link = str(link)
-            # Strips the string of unnecessary characters and leaves the image url
-            profile_url = str(link[link.find('src="')+5:link.find('"/>')])
+            profile_url = link['src']
+            ## TEMP CODE ##
+            uPlay_id = str(profile_url[profile_url.find('.net/')+5:profile_url.find('/default')])
+            ## TEMP CODE ##
+
+    ## TEMP CODE ##
+    x = requests.get(f'https://r6stats.com/stats/{uPlay_id}')
+    x_scrape = bs4.BeautifulSoup(x.text, 'html.parser')
+    ## TEMP CODE ##
 
     # Default status is unranked.
     current_rank = 'Not Ranked'
@@ -94,22 +100,23 @@ async def webscrape(context, casual_ranked, scrape):
         for rank in rating.select('img'):
             current_rank = rank['title']
 
-
-
-    # print(scrape.find(style='width: 50px; margin-right: 14px;')['title'])
-
     # This pulls the username and correct formatting from the website.
     for username in scrape.select('.trn-profile-header__name'):
         username_web = str(username.get_text())
 
-    # Pulls the name of the most played character from inside an image link.
-    for mostplayed in scrape.select('.trn-defstat__value'):
+    # TEMPORARY CODE WHILST R6.TRACKER ISNT SHOWING OPERATORS
+    for mostplayed in x_scrape.select('.player-header__left-side'):
         for source in mostplayed.find_all('img', src=True, limit=1):
-            source = str(source)
-            # Strips the string of unnecessary characters and leaves the Operator name
-            waifu = str(source[source.find('title="')+7:source.find('"/>')]).title()
-            # Takes the operator name and adds it to a URL to pull a picture of that Op
-            waifu_picture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
+            waifu_picture = source['src']
+            waifu = str(waifu_picture[waifu_picture.find('res/')+4:waifu_picture.find('_fig')])
+    ## TEMP CODE ##
+
+    # # Pulls the name of the most played character from inside an image link.
+    # for mostplayed in scrape.select('.trn-defstat__value'):
+    #     for source in mostplayed.find_all('img', src=True, limit=1):
+    #         waifu = source['title']
+    #         # Takes the operator name and adds it to a URL to pull a picture of that Op
+    #         waifu_picture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
 
     requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
     # If the user has not played ranked/casual then the 'Time Played' stat
@@ -141,8 +148,8 @@ async def embed_creator(context, casual_ranked, username, profile_url,
     embed.add_field(name="Waifu", value=waifu, inline=True)
     embed.add_field(name="Rank", value=current_rank, inline=True)
     embed.set_image(url=waifu_picture)
-    embed.set_footer(text="*Is there something wrong with this bot? Please let us know by \
-    emailing tough.shit@codeishard.com.*")
+    embed.set_footer(text="*Want to see how your stats compare to your friends? \
+    Head to leaderboard.codeishard.co.uk.*")
     await client.send_message(context.message.channel, embed=embed)
 
 
@@ -162,19 +169,7 @@ async def r6(context, casual_ranked='general', search_cas_rank='general'):
         if u in users:
             username_local = users[u][0]  # username_local stored for checking later
             # Pass this information to the data_request() func.
-            issue = (':flag_cn: :flag_cn: :flag_cn: '
-                     '**Please Note:** Some stats are frozen at the moment '
-                     'because of a problem with the way Ubisoft writes code. '
-                     'They\'re aware of the issue and are (apparently) '
-                     'working on fixing it.'
-                     ':flag_cn: :flag_cn: :flag_cn: ')
-            issue2 = (':flag_cn: :flag_cn: :flag_cn: '
-                      'If your request is urgent, tough shit. We will let you '
-                      'know when it is fixed.'
-                      ':flag_cn: :flag_cn: :flag_cn: ')
-            await client.say(issue)
             await data_request(context, casual_ranked, username_local)
-            await client.say(issue2)
         else:
             print('>Check failed. Is the username on the list?')
             msg = 'I\'m afraid I don\'t have your ID stored for Rainbow 6. \
