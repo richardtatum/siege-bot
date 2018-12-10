@@ -21,7 +21,7 @@ BOT_PREFIX = ('!')
 client = Bot(command_prefix=BOT_PREFIX)
 
 # This is the Bot Token from Discord.
-TOKEN = production
+TOKEN = test
 
 
 # Webscraper function, with required arguments passed from the call.
@@ -85,14 +85,6 @@ async def webscrape(context, casual_ranked, scrape):
     for profile in scrape.select('.trn-profile-header__avatar'):
         for link in profile.find_all('img', src=True):
             profile_url = link['src']
-            ## TEMP CODE ##
-            uPlay_id = str(profile_url[profile_url.find('.net/')+5:profile_url.find('/default')])
-            ## TEMP CODE ##
-
-    ## TEMP CODE ##
-    x = requests.get(f'https://r6stats.com/stats/{uPlay_id}')
-    x_scrape = bs4.BeautifulSoup(x.text, 'html.parser')
-    ## TEMP CODE ##
 
     # Default status is unranked.
     current_rank = 'Not Ranked'
@@ -104,19 +96,12 @@ async def webscrape(context, casual_ranked, scrape):
     for username in scrape.select('.trn-profile-header__name'):
         username_web = str(username.get_text())
 
-    # TEMPORARY CODE WHILST R6.TRACKER ISNT SHOWING OPERATORS
-    for mostplayed in x_scrape.select('.player-header__left-side'):
+    # Pulls the name of the most played character from inside an image link.
+    for mostplayed in scrape.select('.trn-defstat__value'):
         for source in mostplayed.find_all('img', src=True, limit=1):
-            waifu_picture = source['src']
-            waifu = str(waifu_picture[waifu_picture.find('res/')+4:waifu_picture.find('_fig')])
-    ## TEMP CODE ##
-
-    # # Pulls the name of the most played character from inside an image link.
-    # for mostplayed in scrape.select('.trn-defstat__value'):
-    #     for source in mostplayed.find_all('img', src=True, limit=1):
-    #         waifu = source['title']
-    #         # Takes the operator name and adds it to a URL to pull a picture of that Op
-    #         waifu_picture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
+            waifu = source['title'].title()
+            # Takes the operator name and adds it to a URL to pull a picture of that Op
+            waifu_picture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
 
     requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
     # If the user has not played ranked/casual then the 'Time Played' stat
@@ -199,7 +184,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'Update completed. R6Bot back online.')
+    # await client.send_message(client.get_channel('476357549126582272'),
+    #                           'Update completed. R6Bot back online.')
 
 client.run(TOKEN)
