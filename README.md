@@ -44,7 +44,7 @@ pip3 install -r /path/to/requirements.txt
 
 ### Authorised users
 
-Add any server members and their uPlay account names the `users` section in `settings.py`:
+Add any server members and their uPlay account names the `users` dictionary in `users.py`:
 
 ```python
 users = {
@@ -56,7 +56,7 @@ users = {
 ```
 
 ### Server Token
-Add the previously saved server token in `settings.py`:
+Add the previously saved server token into a file called `tokens.py`:
 
 ```python
 production_token = 'xxxXxxXxx.xxxxx.xxxxxXXxxXXxXXXXx'

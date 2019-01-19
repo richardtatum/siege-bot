@@ -5,24 +5,25 @@ Options:
     > !help - Provides a list of available commands.
 
 Note:
-The stats are accessed from R6Tracker by using the uPlay username.
-This is stored in the settings.py file.
+The stats are accessed from r6.tracker.network by using the uPlay username.
+Local usernames can be stored in the users.py as a dictionary. This allows
+Discord to know which user is requesting the stats, otherwise a username must
+be passed to the bot.
 """
 
 import discord
 import random
 import bs4
 import requests
-from settings import users, production, test
+from users import users
+from tokens import production, test
 from discord.ext.commands import Bot
 from discord import Game
 
-BOT_PREFIX = ('!')
-client = Bot(command_prefix=BOT_PREFIX)
+client = Bot(command_prefix='!')  # The prefix used to summon the bot
 
-# This is the Bot Token from Discord.
+# This is the Bot Token from Discord and saved into tokens.py
 TOKEN = production
-
 
 # Webscraper function, with required arguments passed from the call.
 async def data_request(context, casual_ranked, username_local):
@@ -49,16 +50,16 @@ async def data_request(context, casual_ranked, username_local):
 # A fun way of distracting the user if the webscrape fails with a non-404 error.
 # round(random) function used to pick a float between 1-5 and round to 2 decimal points.
 async def error_message(context, author):
-    msg = 'I can\'t access the R6Tracker site right now so I\'ll just guess your K/D instead.'
-    msg2 = 'User {} has a KD of {} on Rainbow 6: Siege'.format(author, round(random.uniform(1, 5), 2))
+    msg = 'I can\'t access the tracker site right now so I\'ll just guess your K/D instead.'
+    msg2 = f'User {author} has a KD of {round(random.uniform(1, 5), 2)} on Rainbow 6: Siege'
     await client.send_message(context.message.channel, msg)
     await client.send_message(context.message.channel, msg2)
 
 
 # Provides an error message whent the website responds with a 404
 async def error_message_404(context, author):
-    msg = ('Either user {} does not exist or the website is '
-           'displaying a 404 error.'.format(author.title()))
+    msg = (f'Either user {author.title()} does not exist or the website is '
+           'displaying a 404 error.')
     msg2 = 'Please check the spelling and try again.'
     await client.send_message(context.message.channel, msg)
     await client.send_message(context.message.channel, msg2)
@@ -68,7 +69,8 @@ async def webscrape(context, casual_ranked, scrape):
     # Creates blank lists for storing required data.
     label, count, data, total = [[] for i in range(4)]
 
-    cas_rank_gen = ['Empty', 'Overview', 'Overview2', 'Current Operation', 'General', 'Casual', 'Ranked']
+    cas_rank_gen = ['Empty', 'Overview', 'Overview2', 'Current Operation',
+                    'General', 'Casual', 'Ranked']
 
     for element in scrape.select('.trn-scont__content'):
             for gen in element.select('.trn-card__content'):
@@ -101,9 +103,9 @@ async def webscrape(context, casual_ranked, scrape):
         for source in mostplayed.find_all('img', src=True, limit=1):
             waifu = source['title'].title()
             # Takes the operator name and adds it to a URL to pull a picture of that Op
-            waifu_picture = 'https://cdn.r6stats.com/figures/{}_figure.png'.format(waifu.lower().replace('ä', 'a'))
+            waifu_picture = f'https://cdn.r6stats.com/figures/{waifu.lower().replace("ä", "a")}_figure.png'
 
-    requested_cas_rank = total[0]['{}'.format(casual_ranked.title())]
+    requested_cas_rank = total[0][f'{casual_ranked.title()}']
     # If the user has not played ranked/casual then the 'Time Played' stat
     # is blank. This checks the length and makes it 0 if nothing is there
     if len(requested_cas_rank['Time Played']) == 0:
@@ -121,8 +123,7 @@ async def webscrape(context, casual_ranked, scrape):
 async def embed_creator(context, casual_ranked, username, profile_url,
                         time_played, kills, deaths, kd, wl, waifu,
                         waifu_picture, current_rank):
-    embed=discord.Embed(title="R6 Stats Checker | {}".
-                        format(casual_ranked.title()), color=0xe3943c)
+    embed=discord.Embed(title=f"R6 Stats Checker | {casual_ranked.title()}", color=0xe3943c)
     embed.set_thumbnail(url=profile_url)
     embed.add_field(name="Username", value=username, inline=True)
     embed.add_field(name="Time Played", value=time_played, inline=True)
@@ -146,7 +147,7 @@ async def embed_creator(context, casual_ranked, username, profile_url,
 async def r6(context, casual_ranked='general', search_cas_rank='general'):
     # Turns the author name into a string so it can be checked against the list
     u = str(context.message.author)  # Print for the log showing who triggered the bot.
-    print('>Stats check by user ' + u + ' | ' + casual_ranked.title())
+    print(f'>Stats check by user {u} | {casual_ranked.title()}')
     # Checks if the argument called is either casual or ranked.
     if casual_ranked.lower() in {'casual', 'ranked', 'general'}:
         # If the author is present in the list, continue with codeself.
@@ -157,8 +158,8 @@ async def r6(context, casual_ranked='general', search_cas_rank='general'):
             await data_request(context, casual_ranked, username_local)
         else:
             print('>Check failed. Is the username on the list?')
-            msg = 'I\'m afraid I don\'t have your ID stored for Rainbow 6. \
-                Please speak to the admin to get you added to the list.'
+            msg = ('I\'m afraid I don\'t have your ID stored for Rainbow 6.'
+                   ' Please speak to the admin to get you added to the list.')
             await client.say(msg)
 
     # If the argument is not casual/ranked then it expects it to be a username
@@ -184,7 +185,5 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    await client.send_message(client.get_channel('476357549126582272'),
-                              'Update completed. R6Bot back online.')
 
 client.run(TOKEN)
