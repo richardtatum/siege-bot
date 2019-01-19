@@ -143,9 +143,9 @@ Once again checks the username on the stats website,and if it matches it will re
 
 ## Authors
 
-* **Richard Tatum** - *Initial work* - [TTKMHN](https://gitlab.com/TTKMHN)
-* **Josh Edney** - *Server scripts* - [FluffBunker](https://gitlab.com/FluffBunker)
-* **Chris Lowe** - *Code review* - [CSL619](https://gitlab.com/CSL619)
+* **Richard Tatum** - *Initial work* - [TTKMHN](https://github.com/richardtatum)
+* **Josh Edney** - *Server scripts* - [FluffBunker](https://github.com/fluffBunker)
+* **Chris Lowe** - *Code review* - [CSL619](https://github.com/csl619)
 
 ## License
 
