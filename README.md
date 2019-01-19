@@ -56,16 +56,17 @@ users = {
 ```
 
 ### Server Token
-Add the previously saved server token into the top of the `discord_bot.py` file:
+Add the previously saved token into the top of the `discord_bot.py` file:
 
 ```python
 TOKEN = 'add_server_token_here'
 ```
-Becomes:
+Becomes something like this:
 
 ```python
 TOKEN = 'motzzJezVPNZyF2NTA0MzIy.Dn0uGQ.rtrAEZIZNSZfWasAtrSDWJkaBIB'
 ```
+(Do not use the above token, it's a dud! Make sure it is the one you copied from the `Bot` page from the Discord developer website.)
 
 
 ## Running the script & use within Discord
