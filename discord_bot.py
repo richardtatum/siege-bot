@@ -23,7 +23,7 @@ from discord import Game
 client = Bot(command_prefix='!')  # The prefix used to summon the bot
 
 # This is the Bot Token from Discord and saved into tokens.py
-TOKEN = production
+TOKEN = 'add_server_token_here'
 
 # Webscraper function, with required arguments passed from the call.
 async def data_request(context, casual_ranked, username_local):

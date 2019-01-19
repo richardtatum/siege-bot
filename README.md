@@ -56,10 +56,15 @@ users = {
 ```
 
 ### Server Token
-Add the previously saved server token into a file called `tokens.py`:
+Add the previously saved server token into the top of the `discord_bot.py` file:
 
 ```python
-production_token = 'xxxXxxXxx.xxxxx.xxxxxXXxxXXxXXXXx'
+TOKEN = 'add_server_token_here'
+```
+Becomes:
+
+```python
+TOKEN = 'motzzJezVPNZyF2NTA0MzIy.Dn0uGQ.rtrAEZIZNSZfWasAtrSDWJkaBIB'
 ```
 
 
