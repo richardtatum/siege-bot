@@ -150,7 +150,7 @@ Once again checks the username on the stats website,and if it matches it will re
 ## Authors
 
 * **Richard Tatum** - *Initial work* - [RichardTatum](https://github.com/richardtatum)
-* **Josh Edney** - *Server scripts* - [FluffBunker](https://github.com/fluffBunker)
+* **Josh Edney** - *System architecture* - [FluffBunker](https://github.com/fluffBunker)
 * **Chris Lowe** - *Code review* - [CSL619](https://github.com/csl619)
 
 ## License
