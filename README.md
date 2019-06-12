@@ -49,9 +49,7 @@ Add any server members and their uPlay account names the `users` dictionary in `
 ```python
 users = {
     'discordusername#2312': ['uPlayusername'],
-    'CSL619#8493': ['CSL619'],
-    'FluffBunker#1757': ['FluffBunker'],
-    'Arcanice#1327': ['Sharkie668']
+    'Tatumkhamun#2312': ['Tatumkhamun']
 }
 ```
 
