@@ -47,7 +47,7 @@ async def api_request(context, username):
 # Embed creator takes the data from the JSON
 # prettyfies the results and sends them as a message.
 async def embed_creator(context, data):
-    embed=discord.Embed(title=f"R6 Stats Checker", color=0xe3943c)
+    embed=discord.Embed(color=0xe3943c)
     embed.set_thumbnail(url=data['profile'])
     embed.add_field(name="Username", value=data['Username'], inline=True)
     embed.add_field(name="Time Played", value=data['Overall']['Time Played'], inline=True)
