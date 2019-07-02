@@ -20,19 +20,20 @@ client = Bot(command_prefix='!')  # The prefix used to summon the bot
 
 # This is the Bot Token from Discord dev page
 TOKEN = 'add_server_token_here'
-API_URL = 'https://api.r6.leaderboards.io/user'
+API_URL = 'https://api.r6.leaderboards.io'
+CHAL_ICON = 'https://cdn.r6.leaderboards.io/images/challenge_icons/RB6_Placeholder_Event.png'
 
 
 # API call to r6.leaderboards.io
 # API Authorisation provided by the Leaderboards admin team
-async def api_request(context, username):
+async def user_request(context, username):
     params = {
         'username': username,
         'authorization': os.environ['API_AUTH']
     }
-    r = requests.get(url=API_URL, params=params)
+    r = requests.get(url=f'{API_URL}/user', params=params)
     if r.status_code == 200:
-        await embed_creator(context, r.json())
+        await profile_embed(context, r.json())
     else:
         if r.status_code == 404:
             msg = 'Stat request failed.'
@@ -44,10 +45,24 @@ async def api_request(context, username):
         await context.send(msg2)
 
 
+# API call to r6.leaderboards.io
+# API Authorisation provided by the Leaderboards admin team
+async def challenge_request(context):
+    params = {
+        'authorization': os.environ['API_AUTH']
+    }
+    r = requests.get(url=f'{API_URL}/weekly_challenge', params=params)
+    if r.status_code == 200:
+        await challenge_embed(context, r.json())
+    else:
+        msg = 'Challenge request failed.'
+        await context.send(msg)
+
+
 # Embed creator takes the data from the JSON
 # prettyfies the results and sends them as a message.
-async def embed_creator(context, data):
-    embed=discord.Embed(color=0xe3943c)
+async def profile_embed(context, data):
+    embed = discord.Embed(color=0xe3943c)
     embed.set_thumbnail(url=data['profile'])
     embed.add_field(name="Username", value=data['Username'], inline=True)
     embed.add_field(name="Time Played", value=data['Overall']['Time Played'], inline=True)
@@ -63,6 +78,18 @@ async def embed_creator(context, data):
     await context.send(embed=embed)
 
 
+# Embed creator takes the data from the JSON
+# prettyfies the results and sends them as a message.
+async def challenge_embed(context, data):
+    embed = discord.Embed(title='This Weeks Challenges:', color=0xe3943c)
+    embed.set_thumbnail(url=CHAL_ICON)
+    for d in data:
+        embed.add_field(name=d, value=data[d], inline=True)
+    embed.set_footer(text="*Want to see how your stats compare to your friends? \
+    Head to r6.leaderboards.io*")
+    await context.send(embed=embed)
+
+
 # Callable command
 @client.command(pass_context=True, aliases=['stats', 'Stats'])
 async def r6(context):
@@ -71,12 +98,21 @@ async def r6(context):
     print(f'>Stats check by user {u}')
     if u in users:
         username_local = users[u][0]  # username_local stored for checking later
-        await api_request(context, username_local)
+        await user_request(context, username_local)
     else:
         print('>Check failed. Is the username on the list?')
         msg = ('I\'m afraid I don\'t have your ID stored for Rainbow 6.'
                ' Please speak to the admin to get you added to the list.')
         await context.send(msg)
+
+
+# Callable command
+@client.command(pass_context=True, aliases=['challenges', 'challenge'])
+async def chall(context):
+    # Turns the author name into a string so it can be checked against the list
+    u = str(context.message.author)  # Print for the log showing who triggered the bot.
+    print(f'>Challenges request by user {u}')
+    await challenge_request(context)
 
 
 # Helpful message printed when the code is first run
