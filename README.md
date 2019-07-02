@@ -1,9 +1,11 @@
 # R6 Discord Bot
 
-The bot scrapes user data from r6.tracker.network and provides it in a nice embed within Discord.
+The bot pulls data from the [r6.leaderboards.io](https://r6.leaderboards.io) API and provides it in a nice embed within Discord.
 
 ## Prior Note
 This is my first Discord Bot. There are many other R6 Stats bots out there that are probably infinitely better. This was simply a learning exercise and a cool little project.
+
+For the API to correctly provide statistics, the user needs to have an account at [r6.leaderboards.io](https://r6.leaderboards.io). You will also require an API key which you can request through the [contact form](https://r6.leaderboards.io/contact).
 
 
 ## Installation
@@ -96,14 +98,9 @@ Logged in as:
 BOTNAME
 BOTID6337995776
 ------
->Stats check by user Tatumkhamun#2312 | Casual
-```
+>Stats check by user Tatumkhamun#2312
 
-Including if something didn't go to plan:
-
-```
->Stats check by user Tatumkhamun#2312 | Idiot
->Check failed. 404 on the username.
+>Challenges request by user Tatumkhamun#2312
 ```
 
 ### Discord
@@ -111,38 +108,22 @@ Including if something didn't go to plan:
 If the bot is correctly up and running you can activate it with the following command:
 
 ```
-!r6 or !stats
+!stats
 ```
 Takes the users name and checks it against the list. If the name matches it will return stats based on the uPlay username submitted.
-This defaults to `general` stats.
 
-![](https://imgur.com/p8TR7Qr.png)
-
-```
-!r6/!stats followed by general, casual or ranked
-```
-Once again checks the username against the list and if it matches it will return the requested statistics.
-
-![](https://imgur.com/JV6pbqx.png)
+![](https://i.imgur.com/aGqwFIs.png)
 
 ```
-!r6/!stats followed by a username
+!challenge/challenges
 ```
-Searches for the username on the stats website, and returns their `general` stats if possible. Otherwise returns an error message.
+This provides a list of the current weeks challenges and their description.
 
-![](https://imgur.com/7SY1oaw.png)
+![](https://i.imgur.com/2Lqcbls.png)
 
-```
-!r6/!stats followed by a username, followed by general, casual or ranked
-```
-Once again checks the username on the stats website,and if it matches it will return the requested statistics.
-
-![](https://imgur.com/BHIZrOv.png)
 
 ## Built With
 * [Discord](https://discordpy.readthedocs.io/en/latest/index.html) - The framework used
-* [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/) - For working through scraped HTML
-
 
 
 ## Authors
