@@ -38,7 +38,7 @@ async def challenge_request(context):
 
 # Embed creator takes the data from the JSON
 # prettyfies the results and sends them as a message.
-async def profile_embed(context, data):
+async def compose_stats_message(context, data):
     embed = discord.Embed(color=0xe3943c)
     embed.set_thumbnail(url=data['profile'])
     embed.add_field(name="Username", value=data['Username'], inline=True)
@@ -52,32 +52,34 @@ async def profile_embed(context, data):
     embed.set_image(url=data['waifu_img'])
     embed.set_footer(text="*Want to see how your stats compare to your friends? \
     Head to r6.leaderboards.io*")
-    await context.send(embed=embed)
+    await context.send(embed)
 
 
 # Embed creator takes the data from the JSON
 # prettyfies the results and sends them as a message.
-async def challenge_embed(context, data):
+async def compose_challenge_message(context, data):
     embed = discord.Embed(title='This Weeks Challenges:', color=0xe3943c)
-    embed.set_thumbnail(url=CHAL_ICON)
+    embed.set_thumbnail(url=settings.CHAL_ICON)
+
     for d in data:
         embed.add_field(name=d, value=data[d], inline=True)
+
     embed.set_footer(text="*Want to see how your stats compare to your friends? \
     Head to r6.leaderboards.io*")
-    await context.send(embed=embed)
+    await context.send(embed)
 
 
 # Callable command
-@client.command(pass_context=True, aliases=['stats', 'Stats'])
-async def r6(context):
-    # Turns the author name into a string so it can be checked against the list
-    u = str(context.message.author)  # Print for the log showing who triggered the bot.
-    print(f'>Stats check by user {u}')
-    if u in users:
+@client.command(pass_context=True, aliases=['stats'])
+async def invoke_stats_request(context):
+    # Grab the username
+    user = str(context.message.author)  # Print for the log showing who triggered the bot.
+
+    if user in users:
         username_local = users[u][0]  # username_local stored for checking later
         await user_request(context, username_local)
+
     else:
-        print('>Check failed. Is the username on the list?')
         msg = ('I\'m afraid I don\'t have your ID stored for Rainbow 6.'
                ' Please speak to the admin to get you added to the list.')
         await context.send(msg)
@@ -85,14 +87,10 @@ async def r6(context):
 
 # Callable command
 @client.command(pass_context=True, aliases=['challenges', 'challenge'])
-async def chall(context):
-    # Turns the author name into a string so it can be checked against the list
-    u = str(context.message.author)  # Print for the log showing who triggered the bot.
-    print(f'>Challenges request by user {u}')
+async def invoke_challenge_request(context):
     await challenge_request(context)
 
 
-# Helpful message printed when the code is first run
 @client.event
 async def on_ready():
     await client.change_presence(activity=discord.Game("with humans"))
@@ -102,3 +100,4 @@ async def on_ready():
     print('------')
 
 client.run(TOKEN)
+
