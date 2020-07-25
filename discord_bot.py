@@ -12,16 +12,13 @@ the 'users.py' file as a dictionary.
 
 import discord
 import requests
+import api
+import settings
 from users import users
 from discord.ext.commands import Bot
-import os
 
 client = Bot(command_prefix='!')  # The prefix used to summon the bot
 
-# This is the Bot Token from Discord dev page
-TOKEN = 'add_server_token_here'
-API_URL = 'https://api.r6.leaderboards.io'
-CHAL_ICON = 'https://cdn.r6.leaderboards.io/images/challenge_icons/RB6_Placeholder_Event.png'
 
 
 # API call to r6.leaderboards.io
