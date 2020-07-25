@@ -56,7 +56,7 @@ users = {
 ```
 
 ### Server Token
-Add the previously saved token into the top of the `discord_bot.py` file:
+Add the previously saved token into the `settings.py` file:
 
 ```python
 TOKEN = 'add_server_token_here'
@@ -76,7 +76,7 @@ TOKEN = 'motzzJezVPNZyF2NTA0MzIy.Dn0uGQ.rtrAEZIZNSZfWasAtrSDWJkaBIB'
 Run:
 
 ```
-python3 discord_bot.py
+python3 run.py
 ```
 in the terminal, once the prerequisites have been completed, and you should be greeted with the following:
 
