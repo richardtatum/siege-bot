@@ -22,6 +22,7 @@ client = Bot(command_prefix='!')  # The prefix used to summon the bot
 
 async def user_request(context, username):
     response = api.user_request(username)
+
     if response["success"]:
         await compose_stats_message(context, reponse["message"])
     else:
@@ -30,6 +31,7 @@ async def user_request(context, username):
 
 async def challenge_request(context):
     response = api.challenge_request()
+
     if response["success"]:
         await compose_challenge_message(context, response["message"])
     else:
@@ -78,7 +80,6 @@ async def invoke_stats_request(context):
     if user in users:
         username_local = users[u][0]  # username_local stored for checking later
         await user_request(context, username_local)
-
     else:
         msg = ('I\'m afraid I don\'t have your ID stored for Rainbow 6.'
                ' Please speak to the admin to get you added to the list.')
