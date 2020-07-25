@@ -20,40 +20,20 @@ from discord.ext.commands import Bot
 client = Bot(command_prefix='!')  # The prefix used to summon the bot
 
 
-
-# API call to r6.leaderboards.io
-# API Authorisation provided by the Leaderboards admin team
 async def user_request(context, username):
-    params = {
-        'username': username,
-        'authorization': os.environ['API_AUTH']
-    }
-    r = requests.get(url=f'{API_URL}/user', params=params)
-    if r.status_code == 200:
-        await profile_embed(context, r.json())
+    response = api.user_request(username)
+    if response["success"]:
+        await compose_stats_message(context, reponse["message"])
     else:
-        if r.status_code == 404:
-            msg = 'Stat request failed.'
-            msg2 = 'It is likely you do not have an account at r6.leaderboards.io'
-        else:
-            msg = 'Stat request failed.'
-            msg2 = f'Reason: {r.json()["message"]} - Status Code: {r.status_code}'
-        await context.send(msg)
-        await context.send(msg2)
+        await context.send(response["message"])
 
 
-# API call to r6.leaderboards.io
-# API Authorisation provided by the Leaderboards admin team
 async def challenge_request(context):
-    params = {
-        'authorization': os.environ['API_AUTH']
-    }
-    r = requests.get(url=f'{API_URL}/weekly_challenge', params=params)
-    if r.status_code == 200:
-        await challenge_embed(context, r.json())
+    response = api.challenge_request()
+    if response["success"]:
+        await compose_challenge_message(context, response["message"])
     else:
-        msg = 'Challenge request failed.'
-        await context.send(msg)
+        await context.send(response["message"])
 
 
 # Embed creator takes the data from the JSON
